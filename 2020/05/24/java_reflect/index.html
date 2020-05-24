@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>Java 反射机制 - Boozhi</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+<link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/tomorrow-night-eighties.min.css" />
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_fmb4a04yx8h.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 50vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Boozhi</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">
+              
+              Home</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">
+              
+              Archives</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">
+              
+              Categories</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">
+              
+              Tags</a>
+          </li>
+        
+          
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">
+              
+              About</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('https://cdn.shopify.com/s/files/1/1581/1003/articles/lake-mcdonald-landscape-panorama-sunset-158385_1400x.progressive.jpeg.jpg?v=1498513116') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.5)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+                <div class="mt-3 post-meta">
+                  <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+                  <time datetime="2020-05-24 16:26">
+                    May 24, 2020 pm
+                  </time>
+                </div>
+              
+
+              <div class="mt-1">
+                
+                  
+                  <span class="post-meta mr-2">
+                    <i class="iconfont icon-chart"></i>
+                    1.7k 字
+                  </span>
+                
+
+                
+                  
+                  <span class="post-meta mr-2">
+                      <i class="iconfont icon-clock-fill"></i>
+                    
+                    
+                    25
+                     分钟
+                  </span>
+                
+
+                
+              </div>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Java-反射机制背景"><a href="#Java-反射机制背景" class="headerlink" title="Java 反射机制背景"></a>Java 反射机制背景</h2><p>在Java运行的环境中，对于任意一个类，能否知道这个类有哪些属性和方法？<br>或者说，对任意一个对象，能否调用它的任意一个方法？</p>
+<p>这种动态获取类的信息以及动态调用对象的方法的功能来自于Java的语法放射机制</p>
+<ul>
+<li>Java的语言反射机制主要有4个功能 <ol>
+<li>在运行时判断任意一个对象属性所属的类</li>
+<li>在运行时构造任意一个类的对象</li>
+<li>在运行时判断任意一个类所具有的成员变量和方法</li>
+<li>在运行时调用任意一个对象的方法</li>
+</ol>
+</li>
+</ul>
+<p>Reflection 机制是Java被视为准动态语言的一个关键性质。<br>动态语言: 指程序运行时，允许改变程序结构或变量类型的编程语言。</p>
+<p>这个机制允许程序在运行时通过Relection APIs获取任何一个已知名称的class的内部信息</p>
+<ul>
+<li>包括:<ol>
+<li>修饰符 modifiers (public, private, static 等等)</li>
+<li>superclass (Object 等等)</li>
+<li>interfaces (Serializable)</li>
+<li>Fields</li>
+<li>Methods （不包括方法的具体定义）</li>
+</ol>
+</li>
+</ul>
+<p>通过反射，我们可以打破类的包装机制。</p>
+<p>Java程序可以加载一个运行时才得知名称的class，获悉其完整构造，并生成其对象实体，对其的字段赋值，或调用它的方法。这种透析class的能力被称为 <code>Introspection</code> 内省，内观。</p>
+<h2 id="Reflection-常用API"><a href="#Reflection-常用API" class="headerlink" title="Reflection 常用API"></a>Reflection 常用API</h2><p>Java的反射机制包位于 java.lang.reflect包中</p>
+<ol>
+<li>Class类: 代表一个类<ol>
+<li>forName(String className)</li>
+<li>getComponentType()</li>
+<li>getConstructor(Class&lt;?&gt;… parameterTypes)</li>
+<li>getConstructors()</li>
+<li>getInterfaces()</li>
+<li>getField(String name)</li>
+<li>getFields()</li>
+<li>getMethod(String name, Class&lt;?&gt;… parameterTypes)</li>
+<li>getMethods()</li>
+<li>getName()</li>
+<li>getDeclaredConstructor(Class&lt;?&gt;… parameterTypes)</li>
+<li>getDeclaredConstructors()</li>
+<li>getDeclaredField(String name)</li>
+<li>getDeclaredFields()</li>
+<li>getDeclaredMethod(String name, Class&lt;?&gt;… parameterTypes)</li>
+<li>getDeclaredMethods()</li>
+<li>newInstance()</li>
+</ol>
+</li>
+<li>Field类: 代表类的成员变量（属性，字段）<ol>
+<li>get(Object obj)</li>
+<li>getName()</li>
+<li>getType()</li>
+<li>set(Object obj, Object value)</li>
+</ol>
+</li>
+<li>Method类: 代表类的方法<ol>
+<li>getName()</li>
+<li>getReturnType()</li>
+<li>invoke(Object obj, Object… args)</li>
+</ol>
+</li>
+<li>Constructor类: 代表类的构造函数<ol>
+<li>getName()</li>
+<li>newInstance(Object… initargs)</li>
+</ol>
+</li>
+<li>Array类: 提供了动态创建数组，以及访问数组的元素的静态方法<ol>
+<li>newInstance(Class&lt;?&gt; componentType, int… dimensions)</li>
+<li>newInstance(Class&lt;?&gt; componentType, int length)</li>
+<li>get(Object array, int index)</li>
+<li>set(Object array, int index, Object value)</li>
+</ol>
+</li>
+<li>AccessibleObject<ol>
+<li>isAccessible()</li>
+<li>setAccessible(boolean flag)</li>
+</ol>
+</li>
+</ol>
+<div class="hljs"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.reflection;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReflectionTest</span> </span>&#123;
+    <span class="hljs-comment">//成员变量</span>
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> age;
+
+    <span class="hljs-comment">// 构造函数</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ReflectionTest</span><span class="hljs-params">()</span></span>&#123;
+        System.out.println(<span class="hljs-string">"无参构造函数"</span>);
+    &#125;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ReflectionTest</span><span class="hljs-params">(String name)</span></span>&#123;
+        <span class="hljs-keyword">this</span>.name = name;
+    &#125;
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">ReflectionTest</span><span class="hljs-params">(String name, <span class="hljs-keyword">int</span> age)</span></span>&#123;
+        <span class="hljs-keyword">this</span>.name = name;
+        <span class="hljs-keyword">this</span>.age = age;
+    &#125;
+
+
+    <span class="hljs-comment">// getters</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> name;
+    &#125;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123; <span class="hljs-keyword">return</span> age; &#125;
+
+    <span class="hljs-comment">// 成员方法</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-keyword">int</span> a, <span class="hljs-keyword">int</span> b)</span></span>&#123;
+        <span class="hljs-keyword">return</span> a+b;
+    &#125;
+    <span class="hljs-function"><span class="hljs-keyword">private</span> String <span class="hljs-title">sayHello</span><span class="hljs-params">(String word)</span></span>&#123;
+        <span class="hljs-keyword">return</span> <span class="hljs-string">"Hello "</span> + word;
+    &#125;
+&#125;</code></pre></div>
+
+
+<h2 id="案例一-使用反射机制获取对象的实例"><a href="#案例一-使用反射机制获取对象的实例" class="headerlink" title="案例一: 使用反射机制获取对象的实例"></a>案例一: 使用反射机制获取对象的实例</h2><div class="hljs"><pre><code class="hljs java">Class&lt;?&gt; clazz = Class.forName(<span class="hljs-string">"com.reflection.ReflectionTest"</span>);
+Object obj = clazz.getDeclaredConstructor().newInstance();
+
+System.out.println(obj <span class="hljs-keyword">instanceof</span> ReflectionTest); <span class="hljs-comment">//true</span></code></pre></div>
+
+<h2 id="案例二-使用反射机制获取对象的成员属性"><a href="#案例二-使用反射机制获取对象的成员属性" class="headerlink" title="案例二: 使用反射机制获取对象的成员属性"></a>案例二: 使用反射机制获取对象的成员属性</h2><div class="hljs"><pre><code class="hljs java">Class&lt;?&gt; clazz = ReflectionTest<span class="hljs-class">.<span class="hljs-keyword">class</span></span>;
+ReflectionTest obj = (ReflectionTest) clazz.getDeclaredConstructor().newInstance();
+
+<span class="hljs-comment">// age</span>
+Field age = clazz.getDeclaredField(<span class="hljs-string">"age"</span>);
+age.set(obj, <span class="hljs-number">20</span>);
+
+System.out.println(obj.getAge());</code></pre></div>
+
+<h2 id="案例三-使用反射机制获取对象的成员方法"><a href="#案例三-使用反射机制获取对象的成员方法" class="headerlink" title="案例三: 使用反射机制获取对象的成员方法"></a>案例三: 使用反射机制获取对象的成员方法</h2><div class="hljs"><pre><code class="hljs java">Class&lt;?&gt; clazz = <span class="hljs-keyword">new</span> ReflectionTest().getClass();
+Object obj = clazz.getDeclaredConstructor().newInstance();
+
+Method method = clazz.getDeclaredMethod(<span class="hljs-string">"add"</span>, <span class="hljs-keyword">new</span> Class[]&#123;<span class="hljs-keyword">int</span><span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">int</span>.<span class="hljs-title">class</span>&#125;)</span>;
+<span class="hljs-keyword">int</span> res = (<span class="hljs-keyword">int</span>) method.invoke(obj, <span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-number">10</span>,<span class="hljs-number">5</span>&#125;);
+
+System.out.println(res); <span class="hljs-comment">//15</span></code></pre></div>
+
+<h2 id="案例四-使用反射机制获取对象的构造函数-无参-amp-带参"><a href="#案例四-使用反射机制获取对象的构造函数-无参-amp-带参" class="headerlink" title="案例四: 使用反射机制获取对象的构造函数(无参&amp;带参)"></a>案例四: 使用反射机制获取对象的构造函数(无参&amp;带参)</h2><div class="hljs"><pre><code class="hljs java">Class&lt;?&gt; clazz = ReflectionTest<span class="hljs-class">.<span class="hljs-keyword">class</span></span>;
+
+<span class="hljs-comment">// 获取无参构造函数</span>
+Object c = clazz.getConstructor().newInstance();
+
+<span class="hljs-comment">// 获取带参构造函数</span>
+Constructor cons = clazz.getDeclaredConstructor(<span class="hljs-keyword">new</span> Class[]&#123;String<span class="hljs-class">.<span class="hljs-keyword">class</span>&#125;)</span>;
+ReflectionTest obj = (ReflectionTest) cons.newInstance(<span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">"1234567890"</span>&#125;);
+
+System.out.println(obj.getName());</code></pre></div>
+
+<h2 id="案例五-使用放射机制获取对象的私有成员"><a href="#案例五-使用放射机制获取对象的私有成员" class="headerlink" title="案例五: 使用放射机制获取对象的私有成员"></a>案例五: 使用放射机制获取对象的私有成员</h2><div class="hljs"><pre><code class="hljs java">Class&lt;?&gt; clazz = ReflectionTest<span class="hljs-class">.<span class="hljs-keyword">class</span></span>;
+ReflectionTest obj = (ReflectionTest) clazz.getConstructor().newInstance();
+
+<span class="hljs-comment">// 设置私有属性</span>
+Field field = clazz.getDeclaredField(<span class="hljs-string">"name"</span>);
+field.setAccessible(<span class="hljs-keyword">true</span>);
+field.set(obj, <span class="hljs-string">"097654321"</span>);
+System.out.println(<span class="hljs-string">"私有属性 name: "</span> + obj.getName());
+
+<span class="hljs-comment">// 设置私有方法</span>
+Method method = clazz.getDeclaredMethod(<span class="hljs-string">"sayHello"</span>, <span class="hljs-keyword">new</span> Class[]&#123;String<span class="hljs-class">.<span class="hljs-keyword">class</span>&#125;)</span>;
+method.setAccessible(<span class="hljs-keyword">true</span>);
+String res = (String) method.invoke(obj, <span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">"World"</span>&#125;);
+System.out.println(res);
+
+<span class="hljs-comment">// 设置私有构造函数</span>
+Constructor c = clazz.getDeclaredConstructor(<span class="hljs-keyword">new</span> Class[]&#123;String<span class="hljs-class">.<span class="hljs-keyword">class</span>, <span class="hljs-title">int</span>.<span class="hljs-title">class</span>&#125;)</span>;
+c.setAccessible(<span class="hljs-keyword">true</span>);
+ReflectionTest cons = (ReflectionTest) c.newInstance(<span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">"qwertyuiop"</span>, <span class="hljs-number">90</span>&#125;);
+System.out.println(cons.getName());
+System.out.println(cons.getAge());</code></pre></div>
+
+<h2 id="案例六-使用getter-amp-setter-实现对象浅拷贝"><a href="#案例六-使用getter-amp-setter-实现对象浅拷贝" class="headerlink" title="案例六: 使用getter &amp; setter 实现对象浅拷贝"></a>案例六: 使用getter &amp; setter 实现对象浅拷贝</h2><div class="hljs"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dump</span></span>&#123;
+    <span class="hljs-keyword">private</span> String name;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> age;
+    <span class="hljs-keyword">private</span> Order order;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> name;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.name = name;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> age;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setAge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> age)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.age = age;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> Order <span class="hljs-title">getOrder</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> order;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setOrder</span><span class="hljs-params">(Order order)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.order = order;
+    &#125;
+&#125;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Order</span></span>&#123;
+    String orderId;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Order</span><span class="hljs-params">(String orderId)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.orderId = orderId;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getOrderId</span><span class="hljs-params">()</span> </span>&#123;
+        <span class="hljs-keyword">return</span> orderId;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setOrderId</span><span class="hljs-params">(String orderId)</span> </span>&#123;
+        <span class="hljs-keyword">this</span>.orderId = orderId;
+    &#125;
+&#125;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span></span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title">copy</span><span class="hljs-params">(Object object)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;
+        Class&lt;?&gt; clazz = object.getClass();
+        Object obj = clazz.getDeclaredConstructor(<span class="hljs-keyword">new</span> Class[]&#123;&#125;).newInstance(<span class="hljs-keyword">new</span> Object[]&#123;&#125;);
+
+        <span class="hljs-comment">// 获取所有的成员属性</span>
+        Field[] fields = clazz.getDeclaredFields();
+
+        <span class="hljs-keyword">for</span>(Field f: fields)&#123;
+            <span class="hljs-comment">// 获取成员属性名</span>
+            String AttrName = f.getName();
+
+            <span class="hljs-comment">// 将属性名首个小写字母转化为大写字母</span>
+            <span class="hljs-keyword">if</span>(AttrName.charAt(<span class="hljs-number">0</span>) &gt; <span class="hljs-number">96</span> &amp;&amp; AttrName.charAt(<span class="hljs-number">0</span>) &lt; <span class="hljs-number">123</span>)&#123;
+                <span class="hljs-keyword">char</span>[] chars= AttrName.toCharArray();
+                chars[<span class="hljs-number">0</span>] = (<span class="hljs-keyword">char</span>)(((<span class="hljs-keyword">int</span>)chars[<span class="hljs-number">0</span>]) - <span class="hljs-number">32</span>);
+                AttrName = String.valueOf(chars);
+            &#125;
+
+            <span class="hljs-comment">// 获取所有的setter &amp; getter</span>
+            Method setter = clazz.getDeclaredMethod((<span class="hljs-string">"set"</span> + AttrName), <span class="hljs-keyword">new</span> Class[]&#123;f.getType()&#125;);
+            Method getter = clazz.getDeclaredMethod((<span class="hljs-string">"get"</span> + AttrName), <span class="hljs-keyword">new</span> Class[]&#123;&#125;);
+
+            <span class="hljs-comment">// 将对象的成员属性赋值到目标对象中</span>
+            Object value = getter.invoke(object, <span class="hljs-keyword">new</span> Object[]&#123;&#125;);
+            setter.invoke(obj, value);
+        &#125;
+
+        <span class="hljs-keyword">return</span> obj;
+    &#125;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;
+        Dump dump = <span class="hljs-keyword">new</span> Dump();
+        dump.setName(<span class="hljs-string">"Dump"</span>);
+        dump.setAge(<span class="hljs-number">30</span>);
+        dump.setOrder(<span class="hljs-keyword">new</span> Order(<span class="hljs-string">"1234567890"</span>));
+
+        Dump copiedDump = (Dump) Main.copy(dump);
+        System.out.println(dump.getOrder());
+        System.out.println(copiedDump.getOrder());
+        System.out.println(<span class="hljs-string">"原先的象: "</span> + dump);
+        System.out.println(<span class="hljs-string">"复制的对象: "</span> + copiedDump);
+    &#125;
+&#125;</code></pre></div>
+
+<h2 id="案例七-使用放射机制创建一维数组"><a href="#案例七-使用放射机制创建一维数组" class="headerlink" title="案例七: 使用放射机制创建一维数组"></a>案例七: 使用放射机制创建一维数组</h2><div class="hljs"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.lang.reflect.Array;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span></span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;
+        <span class="hljs-comment">// 设置 componentType 组件类型</span>
+        Class&lt;?&gt; clazz = Class.forName(<span class="hljs-string">"java.lang.String"</span>);
+
+        <span class="hljs-comment">// 使用反射创建一个数组实例 newInstance(Class&lt;?&gt; componentType, int length)</span>
+        Object array = Array.newInstance(clazz, <span class="hljs-number">3</span>);
+
+        <span class="hljs-comment">// 为数组中下标为1的元素设置数据</span>
+        Array.set(array, <span class="hljs-number">1</span>, <span class="hljs-string">"Hello World"</span>);
+
+        <span class="hljs-comment">// 获取数据</span>
+        String res = (String) Array.get(array, <span class="hljs-number">1</span>);
+        System.out.println(res);
+
+        <span class="hljs-comment">// 迭代数组中的元素</span>
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;((String[]) array).length ;i++)&#123;
+            System.out.println(((String[]) array)[i]);
+        &#125;
+    &#125;
+&#125;</code></pre></div>
+
+<h2 id="案例八-使用放射机制创建多维数组"><a href="#案例八-使用放射机制创建多维数组" class="headerlink" title="案例八: 使用放射机制创建多维数组"></a>案例八: 使用放射机制创建多维数组</h2><div class="hljs"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.lang.reflect.Array;
+
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Main</span></span>&#123;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;
+        <span class="hljs-comment">// 设置维度&amp;长度</span>
+        <span class="hljs-comment">// 维度一：length=2;</span>
+        <span class="hljs-comment">// 维度二：length=3;</span>
+        <span class="hljs-keyword">int</span>[] dims = <span class="hljs-keyword">new</span> <span class="hljs-keyword">int</span>[]&#123;<span class="hljs-number">2</span>,<span class="hljs-number">3</span>&#125;;
+
+        <span class="hljs-comment">// 设置 componentType</span>
+        Class&lt;?&gt; clazz = Class.forName(<span class="hljs-string">"java.lang.String"</span>);
+
+        <span class="hljs-comment">// 创建多维数组实例 newInstance(Class&lt;?&gt; componentType, int... dimensions)</span>
+        Object array = Array.newInstance(clazz, dims);
+
+        <span class="hljs-comment">// 查看 componentType</span>
+        Class&lt;?&gt; classType = array.getClass().getComponentType();
+        System.out.println(classType);
+
+        <span class="hljs-comment">// 获取第二维度</span>
+        Object obj = Array.get(array, <span class="hljs-number">1</span>);
+
+        <span class="hljs-comment">// 为第二维度设置数据</span>
+        Array.set(obj, <span class="hljs-number">2</span>, <span class="hljs-string">"Hello World"</span>);
+
+        <span class="hljs-comment">// 强制转换数组结果</span>
+        String[][] arr = (String[][]) array;
+
+        System.out.println(<span class="hljs-string">"第一维度长度: "</span> + arr.length);
+        System.out.println(<span class="hljs-string">"第二维度长度: "</span> + arr[<span class="hljs-number">0</span>].length);
+
+        <span class="hljs-comment">// 迭代数组</span>
+        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i&lt;arr.length ;i++)&#123;
+            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> j=<span class="hljs-number">0</span>; j&lt;arr[i].length ;j++)&#123;
+                System.out.print(arr[i][j] + <span class="hljs-string">" "</span>);
+            &#125;
+            System.out.println();
+        &#125;
+    &#125;
+&#125;</code></pre></div>
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/Java/">Java</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
+                    
+                      <a class="hover-with-bg" href="/tags/reflect/">reflect</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">看完全文的你也许会笑得放诞不羁，白嫖可以，记得告诉大伙 Boozhi 奥! 😏</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      &copy; <a href="https://yuxuanjiang.github.io/">Boozhi</a> - 不羁的生涯从此开始
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/main.js" ></script>
+
+
+  <script  src="/js/lazyload.js" ></script>
+
+
+
+  
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: '.post-content',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+<!-- Plugins -->
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Java 反射机制&nbsp;",
+      ],
+      cursorChar: "|",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
