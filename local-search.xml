@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Elastic Search 初体验 - 安装，运行，以及踩坑</title>
+    <link href="/2020/05/26/Elastic-search-basic-md/"/>
+    <url>/2020/05/26/Elastic-search-basic-md/</url>
+    
+    <content type="html"><![CDATA[<h2 id="第一次邂逅-Elastic-Search-的追忆"><a href="#第一次邂逅-Elastic-Search-的追忆" class="headerlink" title="第一次邂逅 Elastic Search 的追忆"></a>第一次邂逅 Elastic Search 的追忆</h2><p>一直以来，虽然花了很多的时间在 <code>Spring</code> 系列框架上，并且一直力求自己能在明白在使用 <code>Spring</code> 框架快速开发可用的，优雅的网站的同时，还能明白底层的实现逻辑。确实却很少关注于其他方面的功能。比如搜索功能！以前在网站的查询功能上是直接将前端用户的查询请求通过 AJAX 动态向后端发送查询请求，然后再通过后端的业务逻辑直接调用DAO，将使用顺序扫描法匹配到数据从数据库直接使用 JSON 格式返回到前端展示给用户。虽然，这种做法在测试阶段还是过得去的，但是其实效率是超级低下的。因此，我在苦恼之际，问了大神朋友他是如何解决这种问题的。从大神朋友那里得到的回答是 <code>Elastic Search</code>!</p><p>说实话，孤陋寡闻的当时还是第一次听说 Elastic Search, 但是不管怎么样，还是要先去了解一下啥是 Elastic Search吧。经过一顿Google上看不懂的介绍后，大概了解了 Elastic Search 其实就是基于 <code>Lucene</code> 之上的一个全文搜索系统。至于 Lucene 是什么，简单理解就是一个强大的全文搜索的引擎。跟 Elastic Search 类似的软件其实不少，还有一个叫 <code>Solr</code> 的跟 Elastic Search 是同一个档次的造物。重要的是，<strong>Elastic Search 仅支持JSON格式</strong>, 但是 Solr 支持多种格式。至于更深的细节，我就不了解了，毕竟我现在连 ES 都还没掌握呢我的哥。</p><p>学习一个新技术吧，还是逃不出那尴尬又没有理由不会发生的事情 - 踩坑。是的，刚开始学习Elastic Search的时候我是真的刚开始就想放弃了！据我目前看来，ES的版本迭代速度跟 <code>Node.js</code> 有的一拼，并且每个版本中 <code>Deprecated</code> 的语法层出不穷。这是最大的一个学习阻碍，我目前使用的是 7.7.0 的ES，但是很多网上的教程其实都低于这个版本的，很多语法都是不兼容的。因此，我在学习的过程中也是不断地尝试，然后将当前版本可用的语法记录下来。</p><h2 id="Elastic-Search-的下载与安装"><a href="#Elastic-Search-的下载与安装" class="headerlink" title="Elastic Search 的下载与安装"></a>Elastic Search 的下载与安装</h2><p>Elastic Search 的下载很简单，直接到Elastic Search的官网下载即可。 <a href="https://www.elastic.co/downloads/elasticsearch" target="_blank" rel="noopener">https://www.elastic.co/downloads/elasticsearch</a></p><p>下载完成后，得到的是一个压缩包。虽然我下载是官网上的 MacOS 版本，里面提供了一个 <code>jdk.app</code> 的可执行文件，但是系统提示这是一个不兼容当前系统版本的程序，因此我也没有使用它。而是直接看向了 <code>bin/elasticsearch</code>。</p><p><img src="https://i.imgur.com/urVyTue.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="如何验证-Elastic-Search-在你电脑上活了？"><a href="#如何验证-Elastic-Search-在你电脑上活了？" class="headerlink" title="如何验证 Elastic Search 在你电脑上活了？"></a>如何验证 Elastic Search 在你电脑上活了？</h2><p>在 terminal 中直接执行该文件，等待一会后就会出现一大堆的配置信息，虽然看不懂，但是也没什么卵用。如何严重系统上的ES是否成功运行？这里有两种方法来验证。 </p><ol><li>使用 curl 指令</li></ol><div class="hljs"><pre><code class="hljs bash">curl localhost:9200</code></pre></div><p><img src="https://i.imgur.com/Zx30fUn.jpg" srcset="/img/loading.gif" alt=""></p><ol start="2"><li>直接用浏览器打开 <a href="http://localhost:9200" target="_blank" rel="noopener">http://localhost:9200</a></li></ol><p><img src="https://i.imgur.com/64enzbg.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="如何修改-Elastic-Search-的默认端口号配置？"><a href="#如何修改-Elastic-Search-的默认端口号配置？" class="headerlink" title="如何修改 Elastic Search 的默认端口号配置？"></a>如何修改 Elastic Search 的默认端口号配置？</h2><p>上面这两种方法，不论哪一种其实最终的到的结构都是一样的，只要你使用其中任何一种方法得到了类似的JSON返回，那么恭喜你！你并没有在安装和运行上踩到坑。同时你还了解到，Elastic Search的默认端口是<code>9200</code>。多么深刻的领悟啊。小黑板敲起来，ES的默认端口是 <code>9200</code>。那么这时候问题就来了，你想不想知道该去哪里改这默认的端口号呢(杠精其实都很博学的)？行吧，满足你博学的心情。</p><p><img src="https://i.imgur.com/zBFjemQ.jpg" srcset="/img/loading.gif" alt=""></p><p>看到ES目录下的 <code>config/elasticsearch.yml</code> 配置文件了吗？对，就是它，放荡不羁地打开它！然后找吧，差不多是在 <code>59 行</code> 的位置，这就是ES的默认端口号。你想改的话，就把前面的 <code>#</code> 号去掉并将后面的端口号换成你最好的数字！</p><p><img src="https://i.imgur.com/Sog1QSO.jpg" srcset="/img/loading.gif" alt=""></p><h2 id="如何让-Elastic-Search-在活在后台？"><a href="#如何让-Elastic-Search-在活在后台？" class="headerlink" title="如何让 Elastic Search 在活在后台？"></a>如何让 Elastic Search 在活在后台？</h2><p>学习就是这么的快乐，探索就是要发现新问题！既然到这里我使用 terminal 成功的让ES快乐地运行起来了，反正它运行起来以后我也不能干什么，能不能有什么法子让它运行在后台呢？诶，我该大部分的你肯定想不到这个问题，但是开发者为你想到了。想要把ES运行在后台吧，其实也很简单只要执行:</p><div class="hljs"><pre><code class="hljs bash">/bin/elasticsearch -d</code></pre></div><p><img src="https://i.imgur.com/t3oXMIn.jpg" srcset="/img/loading.gif" alt=""></p><p>运行后，只要没有任何消息反馈给你吧，就说明运行成功了。为啥呢？正所谓没有消息就是最好的消息嘛！想验证ES是否被成功运行在后台了？老规矩，上面提到的两个方法选一个去试。到目前为止，你以为我们探索的脚步就此停歇了？兄弟，你还年轻！</p><h2 id="如何将活在后台的-Elastic-Search-杀死？"><a href="#如何将活在后台的-Elastic-Search-杀死？" class="headerlink" title="如何将活在后台的 Elastic Search 杀死？"></a>如何将活在后台的 Elastic Search 杀死？</h2><p>既然我们现在选择了让ES在后台运行，那么如何将其关闭？一开始我尝试使用 <code>Activity Moniter</code> 去关闭，但是找了一圈真的是没有发现Elastic Search的踪迹(难道是我的打开方式不对？还是ES真的藏的深)。经过一番摸索，我尝试使用 termial 继续查找ES的进程，很幸运的是，我还真的找到了并且成功关闭！老铁礼物刷起来…</p><div class="hljs"><pre><code class="hljs bash">ps -ef | grep elast</code></pre></div><p><img src="https://i.imgur.com/ZG3d9s0.jpg" srcset="/img/loading.gif" alt=""></p><p>从使用 grep 查询到的结果可以看出，图中的 <code>org.elasticsearch.bootstrap.Elasticsearch -d</code> 字样正是我们之前为自己埋下的坑 <code>/bin/elasticsearch -d</code>！这把我自己给牛逼的啊，都能自己给自己埋坑再让自己去踩啦，这把我这小心情牛逼的… 既然我们找到了进程号，接下来的事情就好办了，杀死它呗。杀完进程之后，我们顺便再查询一下。诶，世界真美丽。</p><div class="hljs"><pre><code class="hljs bash"><span class="hljs-built_in">kill</span> 57587</code></pre></div><p><img src="https://i.imgur.com/noFBeTn.jpg" srcset="/img/loading.gif" alt=""></p><p>到此，Elastic Search 算是彻底被放在 terminal 中开来关去了。为今天能熟练开关ES的自己一个么么哒。探索是为了发现，学习是为了踩坑，我还是那个放荡不羁的少年。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>ElasticSearch</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Elastic Search</tag>
+      
+      <tag>踩坑</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Java 反射机制</title>
     <link href="/2020/05/24/java_reflect/"/>
     <url>/2020/05/24/java_reflect/</url>
